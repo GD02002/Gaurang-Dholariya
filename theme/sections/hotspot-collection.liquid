@@ -1,0 +1,1128 @@
+{{ 'section-hotspot-collection.css' | asset_url | stylesheet_tag }}
+{{ 'component-price.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'product-form.js' | asset_url }}" defer="defer"></script>
+<script src="{{ 'hotspot-collection.js' | asset_url }}" defer="defer"></script>
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+{%- liquid
+  assign collection = section.settings.collection
+  assign columns_mobile = section.settings.columns_mobile | plus: 0
+  assign columns_desktop = section.settings.columns_desktop | plus: 0
+  assign is_manual_mode = true
+  if section.settings.hotspot_mode == 'auto'
+    assign is_manual_mode = false
+  endif
+  assign enable_default_hotspots = false
+  if section.settings.hotspot_mode == 'auto'
+    assign enable_default_hotspots = true
+  elsif section.settings.hotspot_mode == blank and section.settings.enable_default_hotspots
+    assign enable_default_hotspots = true
+  endif
+-%}
+
+<div class="hotspot-collection section-{{ section.id }}-padding">
+  <div class="page-width">
+    {%- if section.settings.heading != blank -%}
+      <div class="hotspot-collection__header">
+        <h2 class="hotspot-collection__heading inline-richtext {{ section.settings.heading_size }}">
+          {{ section.settings.heading }}
+        </h2>
+      </div>
+    {%- endif -%}
+
+    <hotspot-collection
+      class="hotspot-collection__grid-wrapper"
+      data-section-id="{{ section.id }}"
+      {% if section.settings.enable_overlay %}
+        data-enable-overlay="true"
+      {% endif %}
+    >
+      <div
+        class="hotspot-collection__grid"
+        style="--hotspot-columns-desktop: {{ columns_desktop }}; --hotspot-columns-mobile: {{ columns_mobile }};"
+      >
+        {%- assign manual_products_rendered = 0 -%}
+        {%- if is_manual_mode and section.blocks.size > 0 -%}
+          {%- for block in section.blocks -%}
+            {%- if block.type == 'hotspot' and block.settings.product != blank and manual_products_rendered < section.settings.products_to_show -%}
+              {%- liquid
+                assign product = block.settings.product
+                assign image = product.featured_image
+                if image == blank and product.images.size > 0
+                  assign image = product.images.first
+                endif
+                assign dot_desktop_x = block.settings.desktop_x
+                assign dot_mobile_x = block.settings.mobile_x
+                if block.settings.flip_desktop_x
+                  assign dot_desktop_x = 100 | minus: block.settings.desktop_x
+                endif
+                if block.settings.flip_mobile_x
+                  assign dot_mobile_x = 100 | minus: block.settings.mobile_x
+                endif
+              -%}
+              <article class="hotspot-collection__item" data-product-id="{{ product.id }}">
+                <div class="hotspot-collection__image-wrap">
+                  <a href="{{ product.url }}" class="hotspot-collection__image-link" aria-label="{{ product.title | escape }}">
+                    {%- if image != blank -%}
+                      {{
+                        image
+                        | image_url: width: 1200
+                        | image_tag:
+                          loading: 'lazy',
+                          sizes: '(min-width: 990px) calc((100vw - 120px) / var(--hotspot-columns-desktop)), (min-width: 750px) calc((100vw - 70px) / 2), calc((100vw - 40px) / var(--hotspot-columns-mobile))',
+                          widths: '360, 533, 720, 940, 1200',
+                          class: 'hotspot-collection__image'
+                      }}
+                    {%- else -%}
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg hotspot-collection__image' }}
+                    {%- endif -%}
+                  </a>
+                  <button
+                    class="hotspot-collection__dot{% unless block.settings.show_on_desktop %} hotspot-collection__dot--desktop-hidden{% endunless %}{% unless block.settings.show_on_mobile %} hotspot-collection__dot--mobile-hidden{% endunless %}"
+                    type="button"
+                    style="--dot-desktop-x: {{ dot_desktop_x }}%; --dot-desktop-y: {{ block.settings.desktop_y }}%; --dot-mobile-x: {{ dot_mobile_x }}%; --dot-mobile-y: {{ block.settings.mobile_y }}%;"
+                    aria-label="{{ block.settings.dot_label | default: product.title | escape }}"
+                    aria-controls="HotspotModal-{{ section.id }}-{{ block.id }}"
+                    data-hotspot-open="HotspotModal-{{ section.id }}-{{ block.id }}"
+                    {{ block.shopify_attributes }}
+                  >
+                    <span class="hotspot-collection__dot-inner" aria-hidden="true">
+                      {%- if block.settings.show_dot_label and block.settings.dot_label != blank -%}
+                        {{ block.settings.dot_label | escape }}
+                      {%- else -%}
+                        +
+                      {%- endif -%}
+                    </span>
+                  </button>
+                </div>
+              </article>
+              {%- assign manual_products_rendered = manual_products_rendered | plus: 1 -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- if manual_products_rendered > 0 -%}
+        {%- elsif collection != blank and collection.products_count > 0 -%}
+          {%- for product in collection.products limit: section.settings.products_to_show -%}
+            {%- liquid
+              assign image = product.featured_image
+              assign product_loop_index = forloop.index
+              if image == blank and product.images.size > 0
+                assign image = product.images.first
+              endif
+            -%}
+            <article class="hotspot-collection__item" data-product-id="{{ product.id }}">
+              <div class="hotspot-collection__image-wrap">
+                <a href="{{ product.url }}" class="hotspot-collection__image-link" aria-label="{{ product.title | escape }}">
+                  {%- if image != blank -%}
+                    {{
+                      image
+                      | image_url: width: 1200
+                      | image_tag:
+                        loading: 'lazy',
+                        sizes: '(min-width: 990px) calc((100vw - 120px) / var(--hotspot-columns-desktop)), (min-width: 750px) calc((100vw - 70px) / 2), calc((100vw - 40px) / var(--hotspot-columns-mobile))',
+                        widths: '360, 533, 720, 940, 1200',
+                        class: 'hotspot-collection__image'
+                    }}
+                  {%- else -%}
+                    {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg hotspot-collection__image' }}
+                  {%- endif -%}
+                </a>
+
+                {%- assign has_hotspot_block = false -%}
+                {%- assign hotspot_block_index = 0 -%}
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'hotspot' -%}
+                    {%- assign hotspot_block_index = hotspot_block_index | plus: 1 -%}
+                  {%- endif -%}
+                  {%- assign manual_block_matches_product = false -%}
+                  {%- if block.type == 'hotspot' -%}
+                    {%- if is_manual_mode and hotspot_block_index == product_loop_index -%}
+                      {%- assign manual_block_matches_product = true -%}
+                    {%- elsif is_manual_mode == false and block.settings.product != blank and block.settings.product.id == product.id -%}
+                      {%- assign manual_block_matches_product = true -%}
+                    {%- elsif is_manual_mode == false and block.settings.product == blank and hotspot_block_index == product_loop_index -%}
+                      {%- assign manual_block_matches_product = true -%}
+                    {%- endif -%}
+                  {%- endif -%}
+                  {%- if manual_block_matches_product -%}
+                    {%- assign has_hotspot_block = true -%}
+                    {%- assign dot_desktop_x = block.settings.desktop_x -%}
+                    {%- assign dot_mobile_x = block.settings.mobile_x -%}
+                    {%- if block.settings.flip_desktop_x -%}
+                      {%- assign dot_desktop_x = 100 | minus: block.settings.desktop_x -%}
+                    {%- endif -%}
+                    {%- if block.settings.flip_mobile_x -%}
+                      {%- assign dot_mobile_x = 100 | minus: block.settings.mobile_x -%}
+                    {%- endif -%}
+                    <button
+                      class="hotspot-collection__dot{% unless block.settings.show_on_desktop %} hotspot-collection__dot--desktop-hidden{% endunless %}{% unless block.settings.show_on_mobile %} hotspot-collection__dot--mobile-hidden{% endunless %}"
+                      type="button"
+                      style="--dot-desktop-x: {{ dot_desktop_x }}%; --dot-desktop-y: {{ block.settings.desktop_y }}%; --dot-mobile-x: {{ dot_mobile_x }}%; --dot-mobile-y: {{ block.settings.mobile_y }}%;"
+                      aria-label="{{ block.settings.dot_label | default: block.settings.product.title | escape }}"
+                      aria-controls="HotspotModalProduct-{{ section.id }}-{{ product.id }}"
+                      data-hotspot-open="HotspotModalProduct-{{ section.id }}-{{ product.id }}"
+                      {{ block.shopify_attributes }}
+                    >
+                      <span class="hotspot-collection__dot-inner" aria-hidden="true">
+                        {%- if block.settings.show_dot_label and block.settings.dot_label != blank -%}
+                          {{ block.settings.dot_label | escape }}
+                        {%- else -%}
+                          +
+                        {%- endif -%}
+                      </span>
+                    </button>
+                  {%- endif -%}
+                {%- endfor -%}
+
+                {%- if has_hotspot_block == false and enable_default_hotspots -%}
+                  {%- liquid
+                    assign position_key = forloop.index | modulo: 6
+                    assign default_desktop_x = 59
+                    assign default_desktop_y = 54
+                    assign default_mobile_x = 59
+                    assign default_mobile_y = 54
+                    case position_key
+                      when 1
+                        assign default_desktop_x = 59
+                        assign default_desktop_y = 54
+                        assign default_mobile_x = 59
+                        assign default_mobile_y = 54
+                      when 2
+                        assign default_desktop_x = 82
+                        assign default_desktop_y = 50
+                        assign default_mobile_x = 82
+                        assign default_mobile_y = 50
+                      when 3
+                        assign default_desktop_x = 60
+                        assign default_desktop_y = 19
+                        assign default_mobile_x = 60
+                        assign default_mobile_y = 19
+                      when 4
+                        assign default_desktop_x = 70
+                        assign default_desktop_y = 16
+                        assign default_mobile_x = 70
+                        assign default_mobile_y = 16
+                      when 5
+                        assign default_desktop_x = 49
+                        assign default_desktop_y = 23
+                        assign default_mobile_x = 49
+                        assign default_mobile_y = 23
+                      when 0
+                        assign default_desktop_x = 74
+                        assign default_desktop_y = 37
+                        assign default_mobile_x = 74
+                        assign default_mobile_y = 37
+                    endcase
+                  -%}
+                  <button
+                    class="hotspot-collection__dot"
+                    type="button"
+                    style="--dot-desktop-x: {{ default_desktop_x }}%; --dot-desktop-y: {{ default_desktop_y }}%; --dot-mobile-x: {{ default_mobile_x }}%; --dot-mobile-y: {{ default_mobile_y }}%;"
+                    aria-label="{{ product.title | escape }}"
+                    aria-controls="HotspotModalProduct-{{ section.id }}-{{ product.id }}"
+                    data-hotspot-open="HotspotModalProduct-{{ section.id }}-{{ product.id }}"
+                  >
+                    <span class="hotspot-collection__dot-inner" aria-hidden="true">+</span>
+                  </button>
+                {%- endif -%}
+              </div>
+            </article>
+          {%- endfor -%}
+        {%- else -%}
+          <div class="hotspot-collection__empty">No products found</div>
+        {%- endif -%}
+      </div>
+
+      <div class="hotspot-collection__modals">
+        {%- if collection != blank -%}
+          {%- for popup_product in collection.products limit: section.settings.products_to_show -%}
+            {%- liquid
+              assign current_variant = popup_product.selected_or_first_available_variant
+              assign popup_form_id = 'HotspotProductFormProduct-' | append: section.id | append: '-' | append: popup_product.id
+              assign popup_description = popup_product.description | strip_html | truncatewords: 22
+            -%}
+            <div
+              id="HotspotModalProduct-{{ section.id }}-{{ popup_product.id }}"
+              class="hotspot-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="HotspotTitleProduct-{{ section.id }}-{{ popup_product.id }}"
+              hidden
+            >
+              <div class="hotspot-modal__backdrop" data-hotspot-close></div>
+              <div class="hotspot-modal__panel" role="document">
+                <button type="button" class="hotspot-modal__close" aria-label="{{ 'accessibility.close' | t }}" data-hotspot-close>
+                  <span class="svg-wrapper">
+                    {{- 'icon-close.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+
+                <div class="hotspot-modal__content hotspot-modal__content--info">
+                  <div class="hotspot-modal__content--info-inner">
+                    <div class="hotspot-modal__media">
+                      {%- if popup_product.featured_image != blank -%}
+                        {{
+                          popup_product.featured_image
+                          | image_url: width: 720
+                          | image_tag:
+                            loading: 'lazy',
+                            sizes: '(min-width: 750px) 240px, calc(100vw - 90px)',
+                            widths: '360, 533, 720',
+                            class: 'hotspot-modal__image'
+                        }}
+                      {%- else -%}
+                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg hotspot-modal__image' }}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="hotspot-modal__details">
+                      <h3 id="HotspotTitleProduct-{{ section.id }}-{{ popup_product.id }}" class="hotspot-modal__title">
+                        {{ popup_product.title | escape }}
+                      </h3>
+
+                      <div class="hotspot-modal__price">
+                        {% render 'price', product: popup_product, use_variant: true, show_badges: false, show_compare_at_price: true %}
+                      </div>
+
+                      {%- if popup_description != blank -%}
+                        <p class="hotspot-modal__description">
+                          {{ popup_description }}
+                        </p>
+                      {%- endif -%}
+
+                    </div>
+                  </div>
+
+                  <div class="hotspot-modal__content hotspot-modal__content--controls">
+                    <product-form class="hotspot-modal__form" data-section-id="{{ section.id }}">
+                      {%- form 'product',
+                        popup_product,
+                        id: popup_form_id,
+                        class: 'form',
+                        novalidate: 'novalidate',
+                        data-type: 'add-to-cart-form'
+                      -%}
+                        <input
+                          type="hidden"
+                          name="id"
+                          value="{{ current_variant.id }}"
+                          class="product-variant-id"
+                          {% if current_variant.available == false %}
+                            disabled
+                          {% endif %}
+                        >
+
+                        <div class="hotspot-modal__variant-pickers" data-hotspot-variant-picker>
+                          {%- for option in popup_product.options_with_values -%}
+                            {%- assign option_name_downcase = option.name | downcase -%}
+                            <div class="hotspot-modal__option{% if option_name_downcase contains 'color' or option_name_downcase contains 'colour' %} hotspot-modal__option--color{% elsif option_name_downcase contains 'size' %} hotspot-modal__option--size{% else %} hotspot-modal__option--other{% endif %}">
+                              <label class="hotspot-modal__option-label" for="HotspotOptionProduct-{{ section.id }}-{{ popup_product.id }}-{{ option.position }}">
+                                {{ option.name | escape }}
+                              </label>
+                              {%- if option_name_downcase contains 'color' or option_name_downcase contains 'colour' -%}
+                                <div class="hotspot-modal__swatches">
+                                  {%- for value in option.values -%}
+                                    {%- assign input_id = 'HotspotRadioProduct-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+                                    {%- assign option_value = value.value | default: value -%}
+                                    <input
+                                      id="{{ input_id }}"
+                                      class="hotspot-modal__swatch-input"
+                                      type="radio"
+                                      name="options[{{ option.name | escape }}]"
+                                      value="{{ option_value | escape }}"
+                                      data-option-position="{{ option.position }}"
+                                      {% if option.selected_value == option_value %}
+                                        checked
+                                      {% endif %}
+                                    >
+                                    {%- assign swatch_color = blank -%}
+                                    {%- if value.swatch.color -%}
+                                      {%- assign swatch_color = 'rgb(' | append: value.swatch.color.rgb | append: ')' -%}
+                                    {%- endif -%}
+                                    <label
+                                      for="{{ input_id }}"
+                                      class="hotspot-modal__swatch-label"
+                                      data-color-name="{{ option_value | escape }}"
+                                      {% if swatch_color != blank %}
+                                        style="--swatch-accent: {{ swatch_color }};"
+                                      {% endif %}
+                                    >
+                                      {{ option_value | escape }}
+                                    </label>
+                                  {%- endfor -%}
+                                </div>
+                              {%- else -%}
+                                <div class="hotspot-modal__select-wrap">
+                                  {%- assign dropdown_id = 'HotspotOptionProduct-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position -%}
+                                  {%- assign selected_dropdown_value = option.selected_value -%}
+                                  <input
+                                    id="{{ dropdown_id }}"
+                                    type="hidden"
+                                    class="hotspot-modal__select-value"
+                                    name="options[{{ option.name | escape }}]"
+                                    data-option-position="{{ option.position }}"
+                                    {% if option_name_downcase contains 'size' %}
+                                      data-size-option="true"
+                                    {% endif %}
+                                    value="{{ selected_dropdown_value | escape }}"
+                                  >
+                                  <button
+                                    type="button"
+                                    class="hotspot-modal__select-trigger"
+                                    data-hotspot-dropdown-trigger
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    aria-controls="{{ dropdown_id }}-menu"
+                                  >
+                                    <span class="hotspot-modal__select-text">
+                                      {% if selected_dropdown_value != blank %}
+                                        {{ selected_dropdown_value | escape }}
+                                      {% elsif option_name_downcase contains 'size' %}
+                                        Choose your size
+                                      {% else %}
+                                        Choose {{ option.name | downcase }}
+                                      {% endif %}
+                                    </span>
+                                    <span class="hotspot-modal__select-icon" aria-hidden="true">
+                                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                                    </span>
+                                  </button>
+                                  <ul
+                                    id="{{ dropdown_id }}-menu"
+                                    class="hotspot-modal__select-menu"
+                                    role="listbox"
+                                    aria-label="{{ option.name | escape }}"
+                                  >
+                                    {%- for value in option.values -%}
+                                      {%- assign option_value = value.value | default: value -%}
+                                      <li>
+                                        <button
+                                          type="button"
+                                          class="hotspot-modal__select-option{% if selected_dropdown_value == option_value %} is-selected{% endif %}"
+                                          data-hotspot-dropdown-option
+                                          data-value="{{ option_value | escape }}"
+                                        >
+                                          {{ option_value }}
+                                        </button>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                </div>
+                              {%- endif -%}
+                            </div>
+                          {%- endfor -%}
+                        </div>
+
+                        <button
+                          type="submit"
+                          name="add"
+                          class="hotspot-modal__submit button button--primary"
+                          aria-live="polite"
+                          data-sold-out-message="true"
+                          {% if current_variant.available == false %}
+                            disabled
+                          {% endif %}
+                        >
+                          <span>
+                            {%- if current_variant.available -%}
+                              {{ 'products.product.add_to_cart' | t }}
+                            {%- else -%}
+                              {{ 'products.product.sold_out' | t }}
+                            {%- endif -%}
+                          </span>
+                          <span class="sold-out-message hidden">
+                            {{ 'products.product.sold_out' | t }}
+                          </span>
+                          <span class="hotspot-modal__submit-icon" aria-hidden="true">
+                            {{- 'icon-arrow.svg' | inline_asset_content -}}
+                          </span>
+                          {%- render 'loading-spinner' -%}
+                        </button>
+
+                        <script type="application/json" class="hotspot-modal__variants-json">
+                          {{ popup_product.variants | json }}
+                        </script>
+                      {%- endform -%}
+                    </product-form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endfor -%}
+        {%- endif -%}
+
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'hotspot' and block.settings.product != blank -%}
+            {%- liquid
+              assign popup_product = block.settings.product
+              assign current_variant = popup_product.selected_or_first_available_variant
+              assign popup_form_id = 'HotspotProductForm-' | append: section.id | append: '-' | append: block.id
+              assign popup_description = block.settings.popup_description
+              if popup_description == blank
+                assign popup_description = popup_product.description | strip_html | truncatewords: 22
+              endif
+            -%}
+            <div
+              id="HotspotModal-{{ section.id }}-{{ block.id }}"
+              class="hotspot-modal"
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="HotspotTitle-{{ section.id }}-{{ block.id }}"
+              hidden
+            >
+              <div class="hotspot-modal__backdrop" data-hotspot-close></div>
+              <div class="hotspot-modal__panel" role="document">
+                <button type="button" class="hotspot-modal__close" aria-label="{{ 'accessibility.close' | t }}" data-hotspot-close>
+                  <span class="svg-wrapper">
+                    {{- 'icon-close.svg' | inline_asset_content -}}
+                  </span>
+                </button>
+
+                  <div class="hotspot-modal__content hotspot-modal__content--info">
+                  <div class="hotspot-modal__media">
+                    {%- if popup_product.featured_image != blank -%}
+                      {{
+                        popup_product.featured_image
+                        | image_url: width: 720
+                        | image_tag:
+                          loading: 'lazy',
+                          sizes: '(min-width: 750px) 240px, calc(100vw - 90px)',
+                          widths: '360, 533, 720',
+                          class: 'hotspot-modal__image'
+                      }}
+                    {%- else -%}
+                      {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg hotspot-modal__image' }}
+                    {%- endif -%}
+                  </div>
+
+                  <div class="hotspot-modal__details">
+                    <h3 id="HotspotTitle-{{ section.id }}-{{ block.id }}" class="hotspot-modal__title">
+                      {{ popup_product.title | escape }}
+                    </h3>
+
+                    <div class="hotspot-modal__price">
+                      {% render 'price', product: popup_product, use_variant: true, show_badges: false, show_compare_at_price: true %}
+                    </div>
+
+                    {%- if popup_description != blank -%}
+                      <p class="hotspot-modal__description">
+                        {{ popup_description }}
+                      </p>
+                    {%- endif -%}
+
+                    </div>
+
+                    <div class="hotspot-modal__content hotspot-modal__content--controls">
+                      <product-form class="hotspot-modal__form" data-section-id="{{ section.id }}">
+                      {%- form 'product',
+                        popup_product,
+                        id: popup_form_id,
+                        class: 'form',
+                        novalidate: 'novalidate',
+                        data-type: 'add-to-cart-form'
+                      -%}
+                        <input
+                          type="hidden"
+                          name="id"
+                          value="{{ current_variant.id }}"
+                          class="product-variant-id"
+                          {% if current_variant.available == false %}
+                            disabled
+                          {% endif %}
+                        >
+
+                        <div class="hotspot-modal__variant-pickers" data-hotspot-variant-picker>
+                          {%- for option in popup_product.options_with_values -%}
+                            {%- assign option_name_downcase = option.name | downcase -%}
+                            <div class="hotspot-modal__option{% if option_name_downcase contains 'color' or option_name_downcase contains 'colour' %} hotspot-modal__option--color{% elsif option_name_downcase contains 'size' %} hotspot-modal__option--size{% else %} hotspot-modal__option--other{% endif %}">
+                              <label class="hotspot-modal__option-label" for="HotspotOption-{{ section.id }}-{{ block.id }}-{{ option.position }}">
+                                {{ option.name | escape }}
+                              </label>
+
+                              {%- if option_name_downcase contains 'color' or option_name_downcase contains 'colour' -%}
+                                <div class="hotspot-modal__swatches">
+                                  {%- for value in option.values -%}
+                                    {%- assign input_id = 'HotspotRadio-' | append: section.id | append: '-' | append: block.id | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+                                    {%- assign option_value = value.value | default: value -%}
+                                    <input
+                                      id="{{ input_id }}"
+                                      class="hotspot-modal__swatch-input"
+                                      type="radio"
+                                      name="options[{{ option.name | escape }}]"
+                                      value="{{ option_value | escape }}"
+                                      data-option-position="{{ option.position }}"
+                                      {% if option.selected_value == option_value %}
+                                        checked
+                                      {% endif %}
+                                    >
+                                    {%- assign swatch_color = blank -%}
+                                    {%- if value.swatch.color -%}
+                                      {%- assign swatch_color = 'rgb(' | append: value.swatch.color.rgb | append: ')' -%}
+                                    {%- endif -%}
+                                    <label
+                                      for="{{ input_id }}"
+                                      class="hotspot-modal__swatch-label"
+                                      data-color-name="{{ option_value | escape }}"
+                                      {% if swatch_color != blank %}
+                                        style="--swatch-accent: {{ swatch_color }};"
+                                      {% endif %}
+                                    >
+                                      {{ option_value | escape }}
+                                    </label>
+                                  {%- endfor -%}
+                                </div>
+                              {%- else -%}
+                                <div class="hotspot-modal__select-wrap">
+                                  {%- assign dropdown_id = 'HotspotOption-' | append: section.id | append: '-' | append: block.id | append: '-' | append: option.position -%}
+                                  {%- assign selected_dropdown_value = option.selected_value -%}
+                                  <input
+                                    id="{{ dropdown_id }}"
+                                    type="hidden"
+                                    class="hotspot-modal__select-value"
+                                    name="options[{{ option.name | escape }}]"
+                                    data-option-position="{{ option.position }}"
+                                    {% if option_name_downcase contains 'size' %}
+                                      data-size-option="true"
+                                    {% endif %}
+                                    value="{{ selected_dropdown_value | escape }}"
+                                  >
+                                  <button
+                                    type="button"
+                                    class="hotspot-modal__select-trigger"
+                                    data-hotspot-dropdown-trigger
+                                    aria-haspopup="listbox"
+                                    aria-expanded="false"
+                                    aria-controls="{{ dropdown_id }}-menu"
+                                  >
+                                    <span class="hotspot-modal__select-text">
+                                      {% if selected_dropdown_value != blank %}
+                                        {{ selected_dropdown_value | escape }}
+                                      {% elsif option_name_downcase contains 'size' %}
+                                        Choose your size
+                                      {% else %}
+                                        Choose {{ option.name | downcase }}
+                                      {% endif %}
+                                    </span>
+                                    <span class="hotspot-modal__select-icon" aria-hidden="true">
+                                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                                    </span>
+                                  </button>
+                                  <ul
+                                    id="{{ dropdown_id }}-menu"
+                                    class="hotspot-modal__select-menu"
+                                    role="listbox"
+                                    aria-label="{{ option.name | escape }}"
+                                  >
+                                    {%- for value in option.values -%}
+                                      {%- assign option_value = value.value | default: value -%}
+                                      <li>
+                                        <button
+                                          type="button"
+                                          class="hotspot-modal__select-option{% if selected_dropdown_value == option_value %} is-selected{% endif %}"
+                                          data-hotspot-dropdown-option
+                                          data-value="{{ option_value | escape }}"
+                                        >
+                                          {{ option_value }}
+                                        </button>
+                                      </li>
+                                    {%- endfor -%}
+                                  </ul>
+                                </div>
+                              {%- endif -%}
+                            </div>
+                          {%- endfor -%}
+                        </div>
+
+                        <button
+                          type="submit"
+                          name="add"
+                          class="hotspot-modal__submit button button--primary"
+                          aria-live="polite"
+                          data-sold-out-message="true"
+                          {% if current_variant.available == false %}
+                            disabled
+                          {% endif %}
+                        >
+                          <span>
+                            {%- if current_variant.available -%}
+                              {{ 'products.product.add_to_cart' | t }}
+                            {%- else -%}
+                              {{ 'products.product.sold_out' | t }}
+                            {%- endif -%}
+                          </span>
+                          <span class="sold-out-message hidden">
+                            {{ 'products.product.sold_out' | t }}
+                          </span>
+                          <span class="hotspot-modal__submit-icon" aria-hidden="true">
+                            {{- 'icon-arrow.svg' | inline_asset_content -}}
+                          </span>
+                          {%- render 'loading-spinner' -%}
+                        </button>
+
+                        <script type="application/json" class="hotspot-modal__variants-json">
+                          {{ popup_product.variants | json }}
+                        </script>
+                      {%- endform -%}
+                      </product-form>
+                  </div>
+                </div>
+              </div>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+
+        {%- if collection != blank and enable_default_hotspots -%}
+          {%- for product in collection.products limit: section.settings.products_to_show -%}
+            {%- assign has_hotspot_block = false -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'hotspot' and block.settings.product != blank and block.settings.product.id == product.id -%}
+                {%- assign has_hotspot_block = true -%}
+              {%- endif -%}
+            {%- endfor -%}
+
+            {%- if has_hotspot_block == false -%}
+              {%- liquid
+                assign popup_product = product
+                assign current_variant = popup_product.selected_or_first_available_variant
+                assign popup_form_id = 'HotspotProductFormAuto-' | append: section.id | append: '-' | append: popup_product.id
+                assign popup_description = popup_product.description | strip_html | truncatewords: 22
+              -%}
+              <div
+                id="HotspotModalAuto-{{ section.id }}-{{ popup_product.id }}"
+                class="hotspot-modal"
+                role="dialog"
+                aria-modal="true"
+                aria-labelledby="HotspotTitleAuto-{{ section.id }}-{{ popup_product.id }}"
+                hidden
+              >
+                <div class="hotspot-modal__backdrop" data-hotspot-close></div>
+                <div class="hotspot-modal__panel" role="document">
+                  <button type="button" class="hotspot-modal__close" aria-label="{{ 'accessibility.close' | t }}" data-hotspot-close>
+                    <span class="svg-wrapper">
+                      {{- 'icon-close.svg' | inline_asset_content -}}
+                    </span>
+                  </button>
+
+                  <div class="hotspot-modal__content hotspot-modal__content--info">
+                    <div class="hotspot-modal__media">
+                      {%- if popup_product.featured_image != blank -%}
+                        {{
+                          popup_product.featured_image
+                          | image_url: width: 720
+                          | image_tag:
+                            loading: 'lazy',
+                            sizes: '(min-width: 750px) 240px, calc(100vw - 90px)',
+                            widths: '360, 533, 720',
+                            class: 'hotspot-modal__image'
+                        }}
+                      {%- else -%}
+                        {{ 'product-apparel-1' | placeholder_svg_tag: 'placeholder-svg hotspot-modal__image' }}
+                      {%- endif -%}
+                    </div>
+
+                    <div class="hotspot-modal__details">
+                      <h3 id="HotspotTitleAuto-{{ section.id }}-{{ popup_product.id }}" class="hotspot-modal__title">
+                        {{ popup_product.title | escape }}
+                      </h3>
+
+                      <div class="hotspot-modal__price">
+                        {% render 'price', product: popup_product, use_variant: true, show_badges: false, , show_compare_at_price: true %}
+                      </div>
+
+                      {%- if popup_description != blank -%}
+                        <p class="hotspot-modal__description">
+                          {{ popup_description }}
+                        </p>
+                      {%- endif -%}
+
+                  </div>
+
+                  <div class="hotspot-modal__content hotspot-modal__content--controls">
+                    <product-form class="hotspot-modal__form" data-section-id="{{ section.id }}">
+                        {%- form 'product',
+                          popup_product,
+                          id: popup_form_id,
+                          class: 'form',
+                          novalidate: 'novalidate',
+                          data-type: 'add-to-cart-form'
+                        -%}
+                          <input
+                            type="hidden"
+                            name="id"
+                            value="{{ current_variant.id }}"
+                            class="product-variant-id"
+                            {% if current_variant.available == false %}
+                              disabled
+                            {% endif %}
+                          >
+
+                          <div class="hotspot-modal__variant-pickers" data-hotspot-variant-picker>
+                            {%- for option in popup_product.options_with_values -%}
+                              {%- assign option_name_downcase = option.name | downcase -%}
+                              <div class="hotspot-modal__option{% if option_name_downcase contains 'color' or option_name_downcase contains 'colour' %} hotspot-modal__option--color{% elsif option_name_downcase contains 'size' %} hotspot-modal__option--size{% else %} hotspot-modal__option--other{% endif %}">
+                                <label class="hotspot-modal__option-label" for="HotspotOptionAuto-{{ section.id }}-{{ popup_product.id }}-{{ option.position }}">
+                                  {{ option.name | escape }}
+                                </label>
+
+                                {%- if option_name_downcase contains 'color' or option_name_downcase contains 'colour' -%}
+                                  <div class="hotspot-modal__swatches">
+                                    {%- for value in option.values -%}
+                                      {%- assign input_id = 'HotspotRadioAuto-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position | append: '-' | append: forloop.index -%}
+                                      {%- assign option_value = value.value | default: value -%}
+                                      <input
+                                        id="{{ input_id }}"
+                                        class="hotspot-modal__swatch-input"
+                                        type="radio"
+                                        name="options[{{ option.name | escape }}]"
+                                        value="{{ option_value | escape }}"
+                                        data-option-position="{{ option.position }}"
+                                        {% if option.selected_value == option_value %}
+                                          checked
+                                        {% endif %}
+                                      >
+                                      {%- assign swatch_color = blank -%}
+                                      {%- if value.swatch.color -%}
+                                        {%- assign swatch_color = 'rgb(' | append: value.swatch.color.rgb | append: ')' -%}
+                                      {%- endif -%}
+                                      <label
+                                        for="{{ input_id }}"
+                                        class="hotspot-modal__swatch-label"
+                                        data-color-name="{{ option_value | escape }}"
+                                        {% if swatch_color != blank %}
+                                          style="--swatch-accent: {{ swatch_color }};"
+                                        {% endif %}
+                                      >
+                                        {{ option_value | escape }}
+                                      </label>
+                                    {%- endfor -%}
+                                  </div>
+                                {%- else -%}
+                                  <div class="hotspot-modal__select-wrap">
+                                    {%- assign dropdown_id = 'HotspotOptionAuto-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position -%}
+                                    {%- assign selected_dropdown_value = option.selected_value -%}
+                                    <input
+                                      id="{{ dropdown_id }}"
+                                      type="hidden"
+                                      class="hotspot-modal__select-value"
+                                      name="options[{{ option.name | escape }}]"
+                                      data-option-position="{{ option.position }}"
+                                      {% if option_name_downcase contains 'size' %}
+                                        data-size-option="true"
+                                      {% endif %}
+                                      value="{{ selected_dropdown_value | escape }}"
+                                    >
+                                    <button
+                                      type="button"
+                                      class="hotspot-modal__select-trigger"
+                                      data-hotspot-dropdown-trigger
+                                      aria-haspopup="listbox"
+                                      aria-expanded="false"
+                                      aria-controls="{{ dropdown_id }}-menu"
+                                    >
+                                      <span class="hotspot-modal__select-text">
+                                        {% if selected_dropdown_value != blank %}
+                                          {{ selected_dropdown_value | escape }}
+                                        {% elsif option_name_downcase contains 'size' %}
+                                          Choose your size
+                                        {% else %}
+                                          Choose {{ option.name | downcase }}
+                                        {% endif %}
+                                      </span>
+                                      <span class="hotspot-modal__select-icon" aria-hidden="true">
+                                        {{- 'icon-caret.svg' | inline_asset_content -}}
+                                      </span>
+                                    </button>
+                                    <ul
+                                      id="{{ dropdown_id }}-menu"
+                                      class="hotspot-modal__select-menu"
+                                      role="listbox"
+                                      aria-label="{{ option.name | escape }}"
+                                    >
+                                      {%- for value in option.values -%}
+                                        {%- assign option_value = value.value | default: value -%}
+                                        <li>
+                                          <button
+                                            type="button"
+                                            class="hotspot-modal__select-option{% if selected_dropdown_value == option_value %} is-selected{% endif %}"
+                                            data-hotspot-dropdown-option
+                                            data-value="{{ option_value | escape }}"
+                                          >
+                                            {{ option_value }}
+                                          </button>
+                                        </li>
+                                      {%- endfor -%}
+                                    </ul>
+                                  </div>
+                                {%- endif -%}
+                              </div>
+                            {%- endfor -%}
+                          </div>
+
+                          <button
+                            type="submit"
+                            name="add"
+                            class="hotspot-modal__submit button button--primary"
+                            aria-live="polite"
+                            data-sold-out-message="true"
+                            {% if current_variant.available == false %}
+                              disabled
+                            {% endif %}
+                          >
+                            <span>
+                              {%- if current_variant.available -%}
+                                {{ 'products.product.add_to_cart' | t }}
+                              {%- else -%}
+                                {{ 'products.product.sold_out' | t }}
+                              {%- endif -%}
+                            </span>
+                            <span class="sold-out-message hidden">
+                              {{ 'products.product.sold_out' | t }}
+                            </span>
+                            <span class="hotspot-modal__submit-icon" aria-hidden="true">
+                              {{- 'icon-arrow.svg' | inline_asset_content -}}
+                            </span>
+                            {%- render 'loading-spinner' -%}
+                          </button>
+
+                          <script type="application/json" class="hotspot-modal__variants-json">
+                            {{ popup_product.variants | json }}
+                          </script>
+                        {%- endform -%}
+                    </product-form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endif -%}
+      </div>
+    </hotspot-collection>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Hotspot collection",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Tisso vison in the wild"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "default": "h1",
+      "options": [
+        { "value": "h2", "label": "Small" },
+        { "value": "h1", "label": "Medium" },
+        { "value": "h0", "label": "Large" }
+      ]
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "label": "Products to show"
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3,
+      "label": "Desktop columns"
+    },
+    {
+      "type": "select",
+      "id": "columns_mobile",
+      "label": "Mobile columns",
+      "default": "2",
+      "options": [
+        { "value": "1", "label": "1 column" },
+        { "value": "2", "label": "2 columns" }
+      ]
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_overlay",
+      "label": "Show hover overlay on images",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "hotspot_mode",
+      "label": "Hotspot mode",
+      "default": "manual",
+      "options": [
+        { "value": "manual", "label": "Manual (set positions from hotspot blocks)" },
+        { "value": "auto", "label": "Auto (theme places default dots)" }
+      ],
+      "info": "Use Manual mode to control Desktop/Mobile hotspot X-Y from each hotspot block."
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 36
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Hotspot",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "text",
+          "id": "dot_label",
+          "label": "Dot label",
+          "default": "+"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_dot_label",
+          "label": "Show label in dot",
+          "default": false
+        },
+        {
+          "type": "header",
+          "content": "Desktop hotspot"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_on_desktop",
+          "label": "Show hotspot on desktop",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "desktop_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Desktop X position",
+          "default": 50
+        },
+        {
+          "type": "checkbox",
+          "id": "flip_desktop_x",
+          "label": "Flip desktop X (from right side)",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "desktop_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Desktop Y position",
+          "default": 50
+        },
+        {
+          "type": "header",
+          "content": "Mobile hotspot"
+        },
+        {
+          "type": "checkbox",
+          "id": "show_on_mobile",
+          "label": "Show hotspot on mobile",
+          "default": true
+        },
+        {
+          "type": "range",
+          "id": "mobile_x",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Mobile X position",
+          "default": 50
+        },
+        {
+          "type": "checkbox",
+          "id": "flip_mobile_x",
+          "label": "Flip mobile X (from right side)",
+          "default": false
+        },
+        {
+          "type": "range",
+          "id": "mobile_y",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "%",
+          "label": "Mobile Y position",
+          "default": 50
+        },
+        {
+          "type": "textarea",
+          "id": "popup_description",
+          "label": "Popup description",
+          "info": "Leave empty to use product description"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 40,
+  "presets": [
+    {
+      "name": "Hotspot collection"
+    }
+  ]
+}
+{% endschema %}

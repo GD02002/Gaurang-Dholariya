@@ -1,0 +1,226 @@
+.gift-guide-banner__desktop-only {
+    display: inline;
+  }
+  
+  .gift-guide-banner__mobile-only {
+    display: none;
+  }
+  
+  .gift-guide-banner {
+    width: 100%;
+    background: var(--gift-guide-bg-color, #ffffff);
+  }
+  
+  .gift-guide-banner__top-media {
+    width: 100%;
+  }
+  
+  .gift-guide-banner__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  
+  .gift-guide-banner__bottom {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(0, 4fr) minmax(0, 6fr);
+  }
+  
+  
+  .gift-guide-banner__content {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3.6rem 3.2rem;
+    background: var(--gift-guide-bg-color, #ffffff);
+    color: var(--gift-guide-text-color, #111111);
+  }
+  
+  .gift-guide-banner__title {
+    margin: 0;
+    font-size: clamp(3.4rem, 1.5vw + 2.2rem, 7rem);
+    line-height: 1.08;
+    font-weight: 500;
+    color: var(--gift-guide-text-color, #111111);
+  }
+  
+  .gift-guide-banner__description {
+    margin-top: 2.4rem;
+    color: var(--gift-guide-text-color, #111111);
+  }
+  
+  .gift-guide-banner__description p {
+    margin: 0;
+    font-size: 1.8rem;
+    line-height: 1.35;
+  }
+  
+  .gift-guide-banner__button {
+    margin-top: 3rem;
+    position: relative;
+    overflow: hidden;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.8rem;
+    min-width: 22rem;
+    min-height: 5rem;
+    padding: 1.2rem 2rem;
+    background: var(--gift-guide-button-bg-color, #000000) !important;
+    color: var(--gift-guide-button-text-color, #ffffff) !important;
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 1.6rem;
+    line-height: 1.2;
+    letter-spacing: 0;
+    align-self: flex-start;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+  
+  .gift-guide-banner__button::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: var(--gift-guide-button-hover-bg-color, #1a1a1a);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.3s ease;
+    z-index: 0;
+  }
+  
+  /* .gift-guide-banner__button[aria-disabled='true'] {
+    opacity: 0.65;
+    pointer-events: none;
+  } */
+  
+  .gift-guide-banner__button>span {
+    position: relative;
+    z-index: 1;
+  }
+  
+  .gift-guide-banner__button-arrow {
+    font-size: 2.2rem;
+    line-height: 1;
+  }
+  
+  .gift-guide-banner--button-animation .gift-guide-banner__button:hover,
+  .gift-guide-banner--button-animation .gift-guide-banner__button:focus-visible {
+    color: var(--gift-guide-button-hover-text-color, #ffffff) !important;
+  }
+  
+  .gift-guide-banner--button-animation .gift-guide-banner__button:hover::before,
+  .gift-guide-banner--button-animation .gift-guide-banner__button:focus-visible::before {
+    transform: scaleX(1);
+  }
+  
+  .gift-guide-banner:not(.gift-guide-banner--button-animation) .gift-guide-banner__button:hover,
+  .gift-guide-banner:not(.gift-guide-banner--button-animation) .gift-guide-banner__button:focus-visible {
+    background: var(--gift-guide-button-hover-bg-color, #1a1a1a) !important;
+    color: var(--gift-guide-button-hover-text-color, #ffffff) !important;
+  }
+  
+  .gift-guide-banner__footer {
+    margin-top: 0;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 4.5rem;
+    padding: 1rem 2rem;
+  }
+  
+  .gift-guide-banner__footer-text {
+    margin: 0;
+    text-align: center;
+    color: var(--gift-guide-text-color, #111111);
+    font-size: 1.4rem;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0;
+  }
+  
+  @media screen and (max-width: 989px) {
+  
+  
+    .gift-guide-banner__content {
+      padding: 2.4rem 2rem;
+    }
+  }
+  
+  @media screen and (max-width: 749px) {
+    .gift-guide-banner__desktop-only {
+      display: none;
+    }
+  
+    .gift-guide-banner__mobile-only {
+      display: inline;
+    }
+  
+    .gift-guide-banner__description .gift-guide-banner__mobile-only {
+      display: block;
+    }
+  
+  
+  
+    .gift-guide-banner__bottom {
+      grid-template-columns: 1fr;
+    }
+  
+    .gift-guide-banner__content {
+      min-height: auto;
+      width: 100%;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
+      order: 1;
+      padding: 3.2rem 1.8rem;
+      position: absolute;
+      max-height: 42rem;
+      height: 100%;
+      background: transparent;
+      display: flex;
+      justify-content: flex-start;
+    }
+  
+    .gift-guide-banner__top-media {
+      display: none;
+    }
+  
+    .gift-guide-banner__bottom-media {
+      order: 2;
+      min-height: 24rem;
+    }
+  
+    .gift-guide-banner__title {
+      font-size: 4rem;
+    }
+  
+    .gift-guide-banner__description {
+      margin-top: 1.8rem;
+      max-width: 34rem;
+    }
+  
+    .gift-guide-banner__description p {
+      font-size: 2rem;
+      line-height: 1.3;
+    }
+  
+    .gift-guide-banner__button {
+      margin-top: auto;
+      margin-bottom: 0;
+      min-width: 20rem;
+      align-self: center;
+    }
+  
+    .gift-guide-banner__footer {
+      min-height: 4rem;
+      padding: 1rem 1.2rem;
+    }
+  
+    .gift-guide-banner__footer-text {
+      font-size: 1.3rem;
+      line-height: 1.1;
+    }
+  }

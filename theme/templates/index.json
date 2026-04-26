@@ -35,36 +35,37 @@
         "heading",
         "button"
       ],
+      "disabled": true,
       "settings": {
         "image_overlay_opacity": 40,
         "image_height": "large",
-        "desktop_content_position": "bottom-center",
-        "show_text_box": false,
         "image_behavior": "none",
+        "desktop_content_position": "bottom-center",
         "desktop_content_alignment": "center",
+        "show_text_box": false,
         "color_scheme": "scheme-3",
-        "mobile_content_alignment": "center",
         "stack_images_on_mobile": false,
+        "mobile_content_alignment": "center",
         "show_text_below": false
       }
     },
     "featured_collection": {
       "type": "featured-collection",
+      "disabled": true,
       "settings": {
+        "collection": "all",
+        "products_to_show": 8,
         "title": "Featured products",
         "heading_size": "h2",
         "description": "",
         "show_description": false,
         "description_style": "body",
-        "collection": "all",
-        "products_to_show": 8,
         "columns_desktop": 4,
-        "color_scheme": "scheme-1",
+        "enable_desktop_slider": false,
         "full_width": false,
         "show_view_all": true,
         "view_all_style": "solid",
-        "enable_desktop_slider": false,
-        "swipe_on_mobile": false,
+        "color_scheme": "scheme-1",
         "image_ratio": "adapt",
         "image_shape": "default",
         "show_secondary_image": true,
@@ -72,13 +73,172 @@
         "show_rating": false,
         "quick_add": "none",
         "columns_mobile": "2",
+        "swipe_on_mobile": false,
         "padding_top": 44,
+        "padding_bottom": 36
+      }
+    },
+    "gift_guide_banner_4Bymyz": {
+      "type": "gift-guide-banner",
+      "name": "Gift guide banner",
+      "settings": {
+        "top_desktop_image": "shopify://shop_images/Frame.png",
+        "top_mobile_image": "shopify://shop_images/banner_mob.png",
+        "desktop_image": "shopify://shop_images/Frame_1.png",
+        "mobile_image": "shopify://shop_images/banner_mob.png",
+        "title_desktop": "The Gift Guide",
+        "title_mobile": "The Gift Guide",
+        "description_desktop": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>",
+        "description_mobile": "<p>Discover Joy: Your Ultimate Holiday Gift Destination.</p>",
+        "button_label_desktop": "Shop now",
+        "button_label_mobile": "Shop now",
+        "button_link": "shopify://collections",
+        "footer_text_desktop": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR",
+        "footer_text_mobile": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR",
+        "section_bg_color": "#ffffff",
+        "section_text_color": "#111111",
+        "button_bg_color": "#000000",
+        "button_text_color": "#ffffff",
+        "enable_button_animation": true,
+        "button_hover_bg_color": "#fff544",
+        "button_hover_text_color": "#000000",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "hotspot_collection_bxPMe4": {
+      "type": "hotspot-collection",
+      "blocks": {
+        "hotspot_CJTJUY": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 62,
+            "flip_desktop_x": false,
+            "desktop_y": 56,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        },
+        "hotspot_EbF4WW": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 85,
+            "flip_desktop_x": false,
+            "desktop_y": 50,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        },
+        "hotspot_qkQVDQ": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 65,
+            "flip_desktop_x": false,
+            "desktop_y": 28,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        },
+        "hotspot_j6eEzV": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 72,
+            "flip_desktop_x": false,
+            "desktop_y": 20,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        },
+        "hotspot_4NH6we": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 48,
+            "flip_desktop_x": false,
+            "desktop_y": 28,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        },
+        "hotspot_pg88Jh": {
+          "type": "hotspot",
+          "settings": {
+            "product": "",
+            "dot_label": "+",
+            "show_dot_label": false,
+            "show_on_desktop": true,
+            "desktop_x": 78,
+            "flip_desktop_x": false,
+            "desktop_y": 40,
+            "show_on_mobile": true,
+            "mobile_x": 60,
+            "flip_mobile_x": false,
+            "mobile_y": 20,
+            "popup_description": ""
+          }
+        }
+      },
+      "block_order": [
+        "hotspot_CJTJUY",
+        "hotspot_EbF4WW",
+        "hotspot_qkQVDQ",
+        "hotspot_j6eEzV",
+        "hotspot_4NH6we",
+        "hotspot_pg88Jh"
+      ],
+      "name": "Hotspot collection",
+      "settings": {
+        "heading": "Tisso vison in the wild",
+        "heading_size": "h1",
+        "collection": "home-page-collection",
+        "products_to_show": 6,
+        "columns_desktop": 3,
+        "columns_mobile": "2",
+        "enable_overlay": false,
+        "hotspot_mode": "manual",
+        "padding_top": 36,
         "padding_bottom": 36
       }
     }
   },
   "order": [
     "image_banner",
-    "featured_collection"
+    "featured_collection",
+    "gift_guide_banner_4Bymyz",
+    "hotspot_collection_bxPMe4"
   ]
 }
