@@ -1,0 +1,200 @@
+{{ 'section-figma-header.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'figma-header.js' | asset_url }}" defer="defer"></script>
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+{%- endstyle -%}
+
+<div
+  class="figma-header section-{{ section.id }}-padding"
+  style="
+    --figma-header-bg: {{ section.settings.bg_color }};
+    --figma-header-text: {{ section.settings.text_color }};
+    --figma-header-btn-bg: {{ section.settings.button_bg_color }};
+    --figma-header-btn-text: {{ section.settings.button_text_color }};
+    --figma-header-btn-hover-bg: {{ section.settings.button_hover_bg_color }};
+    --figma-header-btn-hover-text: {{ section.settings.button_hover_text_color }};
+  "
+>
+  <div class="figma-header__desktop">
+    <a class="figma-header__logo" href="{{ section.settings.logo_url | default: routes.root_url }}">
+      {{ section.settings.logo_text }}
+    </a>
+    <p class="figma-header__message">{{ section.settings.desktop_center_text }}</p>
+    <a
+      class="figma-header__cta"
+      {% if section.settings.button_url != blank %}
+        href="{{ section.settings.button_url }}"
+      {% else %}
+        role="link"
+        aria-disabled="true"
+      {% endif %}
+    >
+      <span>{{ section.settings.button_text }}</span>
+      <span class="figma-header__arrow" aria-hidden="true">→</span>
+    </a>
+  </div>
+
+  <div class="figma-header__mobile" data-figma-header>
+    <div class="figma-header__mobile-top">
+      <button
+        type="button"
+        class="figma-header__toggle"
+        aria-expanded="false"
+        aria-controls="FigmaHeaderMenu-{{ section.id }}"
+        data-figma-header-toggle
+      >
+        <span class="figma-header__hamburger" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </span>
+        <span class="figma-header__close" aria-hidden="true">×</span>
+        <span class="visually-hidden">Toggle header menu</span>
+      </button>
+
+      <a class="figma-header__logo figma-header__logo--mobile" href="{{ section.settings.logo_url | default: routes.root_url }}">
+        {{ section.settings.logo_text }}
+      </a>
+    </div>
+
+    <div id="FigmaHeaderMenu-{{ section.id }}" class="figma-header__mobile-panel" hidden>
+      <p class="figma-header__message">{{ section.settings.mobile_center_text | default: section.settings.desktop_center_text }}</p>
+      <a
+        class="figma-header__cta figma-header__cta--mobile"
+        {% if section.settings.button_url != blank %}
+          href="{{ section.settings.button_url }}"
+        {% else %}
+          role="link"
+          aria-disabled="true"
+        {% endif %}
+      >
+        <span>{{ section.settings.button_text_mobile | default: section.settings.button_text }}</span>
+        <span class="figma-header__arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Figma header",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "logo_text",
+      "label": "Logo text",
+      "default": "TISSO VISION"
+    },
+    {
+      "type": "url",
+      "id": "logo_url",
+      "label": "Logo URL"
+    },
+    {
+      "type": "text",
+      "id": "desktop_center_text",
+      "label": "Center text (desktop)",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "mobile_center_text",
+      "label": "Center text (mobile)",
+      "default": "Find the ideal gift for your loved ones."
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text (desktop)",
+      "default": "Choose gift"
+    },
+    {
+      "type": "text",
+      "id": "button_text_mobile",
+      "label": "Button text (mobile)",
+      "default": "Choose gift"
+    },
+    {
+      "type": "url",
+      "id": "button_url",
+      "label": "Button URL"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background color",
+      "default": "#fff544"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Button hover background color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Figma header"
+    }
+  ]
+}
+{% endschema %}

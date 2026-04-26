@@ -1,0 +1,313 @@
+{{ 'section-gift-guide-banner.css' | asset_url | stylesheet_tag }}
+
+{%- style -%}
+  .section-{{ section.id }}-padding {
+    padding-top: {{ section.settings.padding_top | times: 0.75 | round: 0 }}px;
+    padding-bottom: {{ section.settings.padding_bottom | times: 0.75 | round: 0 }}px;
+  }
+
+  @media screen and (min-width: 750px) {
+    .section-{{ section.id }}-padding {
+      padding-top: {{ section.settings.padding_top }}px;
+      padding-bottom: {{ section.settings.padding_bottom }}px;
+    }
+  }
+{%- endstyle -%}
+
+<div
+  class="gift-guide-banner section-{{ section.id }}-padding{% if section.settings.enable_button_animation %} gift-guide-banner--button-animation{% endif %}"
+  style="
+    --gift-guide-bg-color: {{ section.settings.section_bg_color }};
+    --gift-guide-text-color: {{ section.settings.section_text_color }};
+    --gift-guide-button-bg-color: {{ section.settings.button_bg_color }};
+    --gift-guide-button-text-color: {{ section.settings.button_text_color }};
+    --gift-guide-button-hover-bg-color: {{ section.settings.button_hover_bg_color }};
+    --gift-guide-button-hover-text-color: {{ section.settings.button_hover_text_color }};
+  "
+>
+  <div class="gift-guide-banner__top-media">
+    {%- if section.settings.top_desktop_image != blank or section.settings.top_mobile_image != blank -%}
+      <picture>
+        {%- if section.settings.top_mobile_image != blank -%}
+          <source media="(max-width: 749px)" srcset="{{ section.settings.top_mobile_image | image_url: width: 1200 }}">
+        {%- elsif section.settings.top_desktop_image != blank -%}
+          <source media="(max-width: 749px)" srcset="{{ section.settings.top_desktop_image | image_url: width: 1200 }}">
+        {%- endif -%}
+        {%- if section.settings.top_desktop_image != blank -%}
+          {{
+            section.settings.top_desktop_image
+            | image_url: width: 2600
+            | image_tag:
+              class: 'gift-guide-banner__image',
+              loading: 'lazy',
+              widths: '750, 1000, 1400, 1800, 2200, 2600',
+              sizes: '100vw',
+              alt: section.settings.title_desktop
+          }}
+        {%- else -%}
+          {{
+            section.settings.top_mobile_image
+            | image_url: width: 1400
+            | image_tag:
+              class: 'gift-guide-banner__image',
+              loading: 'lazy',
+              widths: '750, 1000, 1400',
+              sizes: '100vw',
+              alt: section.settings.title_mobile
+          }}
+        {%- endif -%}
+      </picture>
+    {%- else -%}
+      {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg gift-guide-banner__image' }}
+    {%- endif -%}
+  </div>
+
+  <div class="gift-guide-banner__bottom">
+    <div class="gift-guide-banner__content">
+      {%- if section.settings.title_desktop != blank or section.settings.title_mobile != blank -%}
+        <h2 class="gift-guide-banner__title">
+          <span class="gift-guide-banner__desktop-only">{{ section.settings.title_desktop }}</span>
+          <span class="gift-guide-banner__mobile-only">{{ section.settings.title_mobile | default: section.settings.title_desktop }}</span>
+        </h2>
+      {%- endif -%}
+
+      {%- if section.settings.description_desktop != blank or section.settings.description_mobile != blank -%}
+        <div class="gift-guide-banner__description rte">
+          <div class="gift-guide-banner__desktop-only">
+            {{ section.settings.description_desktop }}
+          </div>
+          <div class="gift-guide-banner__mobile-only">
+            {{ section.settings.description_mobile | default: section.settings.description_desktop }}
+          </div>
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label_desktop != blank or section.settings.button_label_mobile != blank -%}
+        <a
+          class="gift-guide-banner__button"
+          {% if section.settings.button_link != blank %}
+            href="{{ section.settings.button_link }}"
+          {% else %}
+            role="link"
+            aria-disabled="true"
+          {% endif %}
+        >
+          <span class="gift-guide-banner__desktop-only">{{ section.settings.button_label_desktop }}</span>
+          <span class="gift-guide-banner__mobile-only">{{ section.settings.button_label_mobile | default: section.settings.button_label_desktop }}</span>
+          <span class="gift-guide-banner__button-arrow" aria-hidden="true">→</span>
+        </a>
+      {%- endif -%}
+    </div>
+
+    
+    <div class="gift-guide-banner__bottom-media">
+      {%- if section.settings.desktop_image != blank or section.settings.mobile_image != blank -%}
+        <picture>
+          {%- if section.settings.mobile_image != blank -%}
+            <source media="(max-width: 749px)" srcset="{{ section.settings.mobile_image | image_url: width: 1000 }}">
+          {%- elsif section.settings.desktop_image != blank -%}
+            <source media="(max-width: 749px)" srcset="{{ section.settings.desktop_image | image_url: width: 1000 }}">
+          {%- endif -%}
+          {%- if section.settings.desktop_image != blank -%}
+            {{
+              section.settings.desktop_image
+              | image_url: width: 2400
+              | image_tag:
+                class: 'gift-guide-banner__image',
+                loading: 'lazy',
+                widths: '750, 1000, 1400, 1800, 2200, 2400',
+                sizes: '(min-width: 1200px) 1200px, 100vw',
+                alt: section.settings.title_desktop
+            }}
+          {%- else -%}
+            {{
+              section.settings.mobile_image
+              | image_url: width: 1400
+              | image_tag:
+                class: 'gift-guide-banner__image',
+                loading: 'lazy',
+                widths: '750, 1000, 1400',
+                sizes: '100vw',
+                alt: section.settings.title_mobile
+            }}
+          {%- endif -%}
+        </picture>
+      {%- else -%}
+        {{ 'lifestyle-2' | placeholder_svg_tag: 'placeholder-svg gift-guide-banner__image' }}
+      {%- endif -%}
+    </div>
+
+    
+  </div>
+  {%- if section.settings.footer_text_desktop != blank or section.settings.footer_text_mobile != blank -%}
+    <div class="gift-guide-banner__footer">
+      <p class="gift-guide-banner__footer-text">
+        <span class="gift-guide-banner__desktop-only">{{ section.settings.footer_text_desktop }}</span>
+        <span class="gift-guide-banner__mobile-only">{{ section.settings.footer_text_mobile | default: section.settings.footer_text_desktop }}</span>
+      </p>
+    </div>
+  {%- endif -%}
+</div>
+
+{% schema %}
+{
+  "name": "Gift guide banner",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "top_desktop_image",
+      "label": "Top image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "top_mobile_image",
+      "label": "Top image (mobile)",
+      "info": "Optional. If empty, desktop image is used on mobile."
+    },
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Bottom image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Bottom image (mobile)",
+      "info": "Optional. If empty, desktop image is used on mobile."
+    },
+    {
+      "type": "text",
+      "id": "title_desktop",
+      "label": "Title (desktop)",
+      "default": "The Gift Guide"
+    },
+    {
+      "type": "text",
+      "id": "title_mobile",
+      "label": "Title (mobile)",
+      "default": "The Gift Guide"
+    },
+    {
+      "type": "richtext",
+      "id": "description_desktop",
+      "label": "Description (desktop)",
+      "default": "<p>Discover Joy: Your Ultimate Holiday Gift Destination. Explore our curated selection and find the perfect gifts to delight your loved ones this holiday season.</p>"
+    },
+    {
+      "type": "richtext",
+      "id": "description_mobile",
+      "label": "Description (mobile)",
+      "default": "<p>Discover Joy: Your Ultimate Holiday Gift Destination.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label_desktop",
+      "label": "Button label (desktop)",
+      "default": "Shop now"
+    },
+    {
+      "type": "text",
+      "id": "button_label_mobile",
+      "label": "Button label (mobile)",
+      "default": "Shop now"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "text",
+      "id": "footer_text_desktop",
+      "label": "Bottom text (desktop)",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+    },
+    {
+      "type": "text",
+      "id": "footer_text_mobile",
+      "label": "Bottom text (mobile)",
+      "default": "SUSTAINABLE, ETHICALLY MADE ACTIVEWEAR"
+    },
+    {
+      "type": "header",
+      "content": "Colors and button hover"
+    },
+    {
+      "type": "color",
+      "id": "section_bg_color",
+      "label": "Section background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "section_text_color",
+      "label": "Text color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_button_animation",
+      "label": "Enable button hover animation",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Button hover background color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_text_color",
+      "label": "Button hover text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding top",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Padding bottom",
+      "default": 0
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gift guide banner"
+    }
+  ]
+}
+{% endschema %}
