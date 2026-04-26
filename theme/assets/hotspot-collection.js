@@ -149,7 +149,7 @@ if (!customElements.get('hotspot-collection')) {
   
           this.activeModal = modal;
           this.openedBy = opener;
-          this.resetSizeSelection(modal);
+          this.ensureDefaultColorSelection(modal);
           document.body.classList.add('overflow-hidden');
           modal.hidden = false;
   
@@ -159,18 +159,36 @@ if (!customElements.get('hotspot-collection')) {
           document.addEventListener('keyup', this.onKeyUp);
         }
   
-        resetSizeSelection(modal) {
-          const sizeSelects = modal.querySelectorAll('.hotspot-modal__select-value[data-size-option="true"]');
-          if (!sizeSelects.length) return;
-  
-          sizeSelects.forEach((selectInput) => {
-            selectInput.value = '';
-            const dropdown = selectInput.closest('.hotspot-modal__select-wrap');
-            const text = dropdown?.querySelector('.hotspot-modal__select-text');
-            const options = dropdown?.querySelectorAll('[data-hotspot-dropdown-option]');
-            if (text) text.textContent = 'Choose your size';
-            options?.forEach((button) => button.classList.remove('is-selected'));
-            selectInput.dispatchEvent(new Event('change', { bubbles: true }));
+        ensureDefaultColorSelection(modal) {
+          const forms = modal.querySelectorAll('form[data-type="add-to-cart-form"]');
+          forms.forEach((form) => {
+            const colorInputs = Array.from(
+              form.querySelectorAll('.hotspot-modal__swatch-input[data-option-position]')
+            );
+            if (!colorInputs.length) return;
+
+            const hasChecked = colorInputs.some((input) => input.checked);
+            if (hasChecked) return;
+
+            const preferredColors = ['white', 'black'];
+            let defaultInput = null;
+
+            for (const colorName of preferredColors) {
+              defaultInput = colorInputs.find((input) =>
+                (input.value || '').trim().toLowerCase().includes(colorName)
+              );
+              if (defaultInput) break;
+            }
+
+            if (!defaultInput) {
+              defaultInput = colorInputs[0];
+            }
+
+            if (!defaultInput) return;
+
+            defaultInput.checked = true;
+            defaultInput.dispatchEvent(new Event('input', { bubbles: true }));
+            defaultInput.dispatchEvent(new Event('change', { bubbles: true }));
           });
         }
   
@@ -201,7 +219,8 @@ if (!customElements.get('hotspot-collection')) {
   
           const pickers = form.querySelectorAll('[data-option-position]');
           pickers.forEach((picker) => {
-            const eventName = picker.tagName === 'SELECT' ? 'change' : 'input';
+            const isRadio = picker.matches('input[type="radio"]');
+            const eventName = isRadio ? 'input' : 'change';
             picker.addEventListener(eventName, () => this.updateVariant(form, variants));
           });
   
@@ -242,7 +261,7 @@ if (!customElements.get('hotspot-collection')) {
           const buttonText = submitButton?.querySelector('span');
   
           if (selectedOptions.some((value) => value === '')) {
-            this.setUnavailableState(variantInput, submitButton, buttonText, true, 'Choose your size');
+            this.setUnavailableState(variantInput, submitButton, buttonText, true, 'Choose options');
             return;
           }
   

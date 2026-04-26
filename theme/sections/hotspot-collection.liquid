@@ -343,7 +343,7 @@
                                       name="options[{{ option.name | escape }}]"
                                       value="{{ option_value | escape }}"
                                       data-option-position="{{ option.position }}"
-                                      {% if option.selected_value == value %}
+                                      {% if option.selected_value == option_value %}
                                         checked
                                       {% endif %}
                                     >
@@ -366,10 +366,7 @@
                               {%- else -%}
                                 <div class="hotspot-modal__select-wrap">
                                   {%- assign dropdown_id = 'HotspotOptionProduct-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position -%}
-                                  {%- assign selected_dropdown_value = '' -%}
-                                  {%- unless option_name_downcase contains 'size' -%}
-                                    {%- assign selected_dropdown_value = option.selected_value -%}
-                                  {%- endunless -%}
+                                  {%- assign selected_dropdown_value = option.selected_value -%}
                                   <input
                                     id="{{ dropdown_id }}"
                                     type="hidden"
@@ -566,7 +563,7 @@
                                       name="options[{{ option.name | escape }}]"
                                       value="{{ option_value | escape }}"
                                       data-option-position="{{ option.position }}"
-                                      {% if option.selected_value == value %}
+                                      {% if option.selected_value == option_value %}
                                         checked
                                       {% endif %}
                                     >
@@ -589,10 +586,7 @@
                               {%- else -%}
                                 <div class="hotspot-modal__select-wrap">
                                   {%- assign dropdown_id = 'HotspotOption-' | append: section.id | append: '-' | append: block.id | append: '-' | append: option.position -%}
-                                  {%- assign selected_dropdown_value = '' -%}
-                                  {%- unless option_name_downcase contains 'size' -%}
-                                    {%- assign selected_dropdown_value = option.selected_value -%}
-                                  {%- endunless -%}
+                                  {%- assign selected_dropdown_value = option.selected_value -%}
                                   <input
                                     id="{{ dropdown_id }}"
                                     type="hidden"
@@ -794,7 +788,7 @@
                                         name="options[{{ option.name | escape }}]"
                                         value="{{ option_value | escape }}"
                                         data-option-position="{{ option.position }}"
-                                        {% if option.selected_value == value %}
+                                        {% if option.selected_value == option_value %}
                                           checked
                                         {% endif %}
                                       >
@@ -817,10 +811,7 @@
                                 {%- else -%}
                                   <div class="hotspot-modal__select-wrap">
                                     {%- assign dropdown_id = 'HotspotOptionAuto-' | append: section.id | append: '-' | append: popup_product.id | append: '-' | append: option.position -%}
-                                    {%- assign selected_dropdown_value = '' -%}
-                                    {%- unless option_name_downcase contains 'size' -%}
-                                      {%- assign selected_dropdown_value = option.selected_value -%}
-                                    {%- endunless -%}
+                                    {%- assign selected_dropdown_value = option.selected_value -%}
                                     <input
                                       id="{{ dropdown_id }}"
                                       type="hidden"
